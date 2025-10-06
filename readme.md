@@ -62,10 +62,10 @@ Antes de tudo, garanta que você tenha os seguintes softwares instalados na sua 
   ### 1. Clone o Repositório
   Abra seu terminal e clone o projeto para sua máquina local:
 
-    git clone https://github.com/ocnaibill/ping-pong-echo.git
+    git clone https://github.com/ocnaibill/concord.git
 
  ### 2. Acesse a pasta do projeto
-    cd [NOME_DA_PASTA_DO_PROJETO]
+    cd concord
 
 ### 3. Instale as Dependências
 
