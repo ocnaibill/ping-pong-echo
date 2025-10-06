@@ -1,0 +1,38 @@
+{
+  "name": "concord",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+  "start:server": "nodemon server/index.js",
+  "start:react": "vite",
+  "start:electron": "wait-on http://localhost:5173 && electron client/main.js",
+  "dev": "concurrently \"npm:start:server\" \"npm:start:react\" \"npm:start:electron\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ocnaibill/ping-pong-echo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ocnaibill/ping-pong-echo/issues"
+  },
+  "homepage": "https://github.com/ocnaibill/ping-pong-echo#readme",
+  "description": "",
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.1",
+    "electron": "^38.2.1",
+    "nodemon": "^3.1.10",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "vite": "^7.1.9",
+    "wait-on": "^9.0.1"
+  }
+}
