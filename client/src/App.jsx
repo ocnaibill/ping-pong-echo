@@ -1,48 +1,61 @@
-// client/src/App.jsx
 import React, { useState } from 'react';
-import ChatPage from './ChatPage'; // Importa a página de Chat
-import SettingsPage from './SettingsPage'; // Importa a página de Configurações
+import ChatPage from './ChatPage.jsx';
+import SettingsPage from './SettingsPage.jsx';
+import SideBar from './components/SideBar.jsx';
 
 function App() {
-  // 1. Criamos um estado para saber qual página está ativa
-  const [currentPage, setCurrentPage] = useState('chat'); // Começa na página 'chat'
+  const [currentPage, setCurrentPage] = useState('chat');
 
-  // 2. Função para renderizar a página correta com base no estado
-  const renderPage = () => {
+  // Esta função agora é responsável por renderizar não só a página,
+  // mas também o layout à volta dela.
+  const renderPageAndLayout = () => {
     switch (currentPage) {
+      // CASO 1: Página de Chat (com barra lateral)
       case 'chat':
-        return <ChatPage />;
+        return (
+          // Usamos um Fragment (<>...</>) para agrupar os dois componentes
+          <>
+            <SideBar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+            <main className="flex-grow">
+              <ChatPage />
+            </main>
+          </>
+        );
+
+      // CASO 2: Caso queira remover a sidebar de uma página é só deletar ela do return
       case 'settings':
-        return <SettingsPage />;
+        return (
+          <>
+              <SideBar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+               <main className="flex-grow">
+            <SettingsPage />
+          </main>
+</>
+
+        );
+
+      // Caso padrão
       default:
-        return <ChatPage />; // Página padrão
+        return (
+          <>
+            <SideBar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+            <main className="flex-grow">
+              <ChatPage />
+            </main>
+          </>
+        );
     }
   };
 
   return (
-    <div className="bg-gray-900 text-white flex flex-col h-screen font-mono">
-      {/* 3. Criamos uma barra de navegação simples */}
-      <nav className="flex bg-gray-800 p-2 space-x-4">
-        <button
-          onClick={() => setCurrentPage('chat')}
-          className={`px-3 py-1 rounded ${currentPage === 'chat' ? 'bg-cyan-500' : 'hover:bg-gray-700'}`}
-        >
-          Chat
-        </button>
-        <button
-          onClick={() => setCurrentPage('settings')}
-          className={`px-3 py-1 rounded ${currentPage === 'settings' ? 'bg-cyan-500' : 'hover:bg-gray-700'}`}
-        >
-          Configurações
-        </button>
-      </nav>
-
-      {/* 4. O conteúdo da página ativa é renderizado aqui */}
-      <main className="flex-grow">
-        {renderPage()}
-      </main>
+    // O div principal agora só define o flexbox.
+    // O conteúdo dinâmico é gerado pela função acima.
+    <div className="bg-gray-900 text-white flex h-screen font-mono">
+      {renderPageAndLayout()}
     </div>
   );
 }
 
 export default App;
+
+
