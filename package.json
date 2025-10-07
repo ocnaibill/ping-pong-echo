@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ocnaibill/ping-pong-echo.git"
+    "url": "git+https://github.com/ocnaibill/concord.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ocnaibill/ping-pong-echo/issues"
+    "url": "https://github.com/ocnaibill/concord/issues"
   },
-  "homepage": "https://github.com/ocnaibill/ping-pong-echo#readme",
+  "homepage": "https://github.com/ocnaibill/concord#readme",
   "description": "",
   "dependencies": {
     "react": "^19.2.0",
