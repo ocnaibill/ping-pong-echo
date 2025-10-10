@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ChatSidebar from './components/ChatSidebar.jsx';
+import InfoBackground from './components/InfoBackground.jsx';
 
 function ChatPage() {
   // Estado para controlar se estamos conectados ou não.
@@ -12,6 +14,12 @@ function ChatPage() {
 
   // Ref para o elemento da área de chat, para rolar automaticamente para baixo.
   const chatAreaRef = useRef(null);
+
+  // Listinha fake só para visualizar a lateral de chats (não impacta lógica do app).
+  const fakeChats = [
+    { id: 1, title: 'Geral', preview: 'Bem-vindo ao Concord' },
+    { id: 2, title: 'Equipe', preview: 'Daily às 9h' },
+  ];
 
   // useEffect é um hook do React que executa efeitos colaterais.
   // Este será executado uma única vez quando o componente for montado.
@@ -62,58 +70,69 @@ function ChatPage() {
     }
   };
 
-  // Aqui começa a renderização da interface com JSX e classes do Tailwind CSS.
-  // Note que agora o wrapper principal tem `flex-col h-full` para ocupar
-  // o espaço que o componente `App.jsx` (router) lhe dá.
+  // Layout em duas colunas (mudança mínima): Sidebar + InfoBackground contendo TODO o seu JSX original
   return (
-    <div className="flex flex-col h-full p-4">
-      <header className="mb-4">
-        <h1 className="text-3xl font-bold text-cyan-400">Chat TCP</h1>
-        <p className="text-gray-400">{statusMessage}</p>
-      </header>
+    <div className="flex h-full gap-6 p-6">
+      <ChatSidebar
+        chats={fakeChats}
+        selectedId={1}
+        onSelect={(id) => console.log('select', id)}
+        onAdd={() => console.log('novo chat')}
+      />
 
-      {/* Botão de Conectar */}
-      {!isConnected && (
-        <div className="mb-4">
-          <button
-            onClick={handleConnect}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded transition-colors"
+      <InfoBackground className="flex-1">
+        {/* ======= SEU JSX ORIGINAL FOI MANTIDO AQUI DENTRO ======= */}
+        <div className="flex flex-col h-full p-4">
+          <header className="mb-4">
+            <h1 className="text-3xl font-bold text-cyan-400">Chat TCP</h1>
+            <p className="text-gray-400">{statusMessage}</p>
+          </header>
+
+          {/* Botão de Conectar */}
+          {!isConnected && (
+            <div className="mb-4">
+              <button
+                onClick={handleConnect}
+                className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded transition-colors"
+              >
+                Conectar ao Servidor
+              </button>
+            </div>
+          )}
+
+          {/* Área de Mensagens */}
+          <div
+            ref={chatAreaRef}
+            className="flex-grow bg-gray-800 rounded-lg p-4 mb-4 overflow-y-auto"
           >
-            Conectar ao Servidor
-          </button>
+            {chatMessages.map((msg, index) => (
+              <p key={index} className="mb-1">
+                {msg}
+              </p>
+            ))}
+          </div>
+
+          {/* Formulário de Envio de Mensagem */}
+          <form onSubmit={handleSendMessage} className="flex">
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder={isConnected ? 'Digite sua mensagem...' : 'Conecte-se para enviar mensagens'}
+              disabled={!isConnected}
+              className="flex-grow bg-gray-700 text-white rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+            <button
+              type="submit"
+              disabled={!isConnected}
+              className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-r-lg disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+            >
+              Enviar
+            </button>
+          </form>
         </div>
-      )}
-
-      {/* Área de Mensagens */}
-      <div
-        ref={chatAreaRef}
-        className="flex-grow bg-gray-800 rounded-lg p-4 mb-4 overflow-y-auto"
-      >
-        {chatMessages.map((msg, index) => (
-          <p key={index} className="mb-1">
-            {msg}
-          </p>
-        ))}
-      </div>
-
-      {/* Formulário de Envio de Mensagem */}
-      <form onSubmit={handleSendMessage} className="flex">
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder={isConnected ? "Digite sua mensagem..." : "Conecte-se para enviar mensagens"}
-          disabled={!isConnected}
-          className="flex-grow bg-gray-700 text-white rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-        />
-        <button
-          type="submit"
-          disabled={!isConnected}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-r-lg disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
-        >
-          Enviar
-        </button>
-      </form>
+        {/* ======= FIM DO SEU JSX ORIGINAL ======= */}
+      </InfoBackground>
     </div>
   );
 }
