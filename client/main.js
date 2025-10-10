@@ -18,7 +18,7 @@ let tcpSocket = null;
 function createWindow() {
     // Cria uma nova janela do navegador.
     const win = new BrowserWindow({
-        width: 800,
+        width: 1000,
         height: 600,
         webPreferences: {
             // __dirname aponta para o diretório do arquivo atual (client/)
