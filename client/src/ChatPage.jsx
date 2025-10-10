@@ -72,7 +72,7 @@ function ChatPage() {
 
   // Layout em duas colunas (mudança mínima): Sidebar + InfoBackground contendo TODO o seu JSX original
   return (
-    <div className="flex h-full gap-6 p-6">
+    <div className="flex h-full gap-6 p-6" style={{ backgroundColor: '#242323' }}>
       <ChatSidebar
         chats={fakeChats}
         selectedId={1}
