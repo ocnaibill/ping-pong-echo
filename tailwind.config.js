@@ -6,7 +6,15 @@ export default {
     "./client/src/**/*.{js,ts,jsx,tsx}", 
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        'chat-pattern': "url('/src/assets/chat-pattern.png')",
+      }
+    },
   },
+  
+  
   plugins: [],
+
+
 }
