@@ -1,61 +1,95 @@
-import React, { useState } from 'react';
+// client/src/App.jsx
+import React, { useState, useEffect } from 'react';
+
 import ChatPage from './ChatPage.jsx';
 import SettingsPage from './SettingsPage.jsx';
-import SideBar from './components/SideBar.jsx';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('chat');
 
-  // Esta função agora é responsável por renderizar não só a página,
-  // mas também o layout à volta dela.
-  const renderPageAndLayout = () => {
+
+  const [isConnected, setIsConnected] = useState(false);
+  const [message, setMessage] = useState('');
+  const [chatMessages, setChatMessages] = useState([]);
+  const [statusMessage, setStatusMessage] = useState('Pronto para conectar.');
+
+  // O useEffect que configura os listeners do Electron agora vive aqui.
+  // Ele só será executado UMA VEZ quando o App montar, e nunca mais será destruído.
+  useEffect(() => {
+    // Listener para dados recebidos
+    window.api.onTcpData((data) => {
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setChatMessages((prevMessages) => [
+        ...prevMessages,
+        { sender: 'server', text: data.trim(), time: timestamp },
+      ]);
+    });
+
+    // Listener para o status da conexão
+    window.api.onTcpStatus((status) => {
+      setIsConnected(status.connected);
+      if (status.connected) {
+        setStatusMessage('Conectado ao servidor!');
+      } else {
+        setStatusMessage(status.error ? `Erro: ${status.error}` : 'Desconectado.');
+      }
+    });
+
+    // A função de limpeza só será chamada se o App inteiro fechar.
+    return () => {
+      window.api.removeAllListeners('tcp-data');
+      window.api.removeAllListeners('tcp-status');
+    };
+  }, []);
+
+  // Funções para manipular o estado do chat
+  const handleConnect = () => {
+    setStatusMessage('Tentando conectar...');
+    window.api.tcpConnect();
+  };
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (message.trim() && isConnected) {
+      window.api.tcpSend(message);
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setChatMessages((prev) => [...prev, { sender: 'user', text: message, time: timestamp }]);
+      setMessage(''); 
+    }
+  };
+  
+
+  const renderPage = () => {
     switch (currentPage) {
-      // CASO 1: Página de Chat (com barra lateral)
       case 'chat':
         return (
-          // Usamos um Fragment (<>...</>) para agrupar os dois componentes
-          <>
-            <SideBar currentPage={currentPage} setCurrentPage={setCurrentPage} />
-            <main className="flex-grow">
-              <ChatPage />
-            </main>
-          </>
+          <ChatPage
+            setCurrentPage={setCurrentPage}
+            isConnected={isConnected}
+            message={message}
+            setMessage={setMessage}
+            chatMessages={chatMessages}
+            statusMessage={statusMessage}
+            handleConnect={handleConnect}
+            handleSendMessage={handleSendMessage}
+          />
         );
 
-      // CASO 2: Caso queira remover a sidebar de uma página é só deletar ela do return
       case 'settings':
         return (
-          <>
-              <SideBar currentPage={currentPage} setCurrentPage={setCurrentPage} />
-               <main className="flex-grow">
-            <SettingsPage />
-          </main>
-</>
-
+          <SettingsPage setCurrentPage={setCurrentPage} />
         );
 
-      // Caso padrão
       default:
-        return (
-          <>
-            <SideBar currentPage={currentPage} setCurrentPage={setCurrentPage} />
-            <main className="flex-grow">
-              <ChatPage />
-            </main>
-          </>
-        );
+        return <div>Página não encontrada</div>;
     }
   };
 
   return (
-    // O div principal agora só define o flexbox.
-    // O conteúdo dinâmico é gerado pela função acima.
-    <div className="bg-gray-900 text-white flex h-screen font-mono">
-      {renderPageAndLayout()}
+    <div className="bg-gray-900 text-white h-screen font-mono">
+      {renderPage()}
     </div>
   );
 }
 
 export default App;
-
-
