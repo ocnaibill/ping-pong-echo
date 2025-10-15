@@ -1,74 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react'; 
 import ChatSidebar from './components/ChatSidebar.jsx';
 import InfoBackground from './components/InfoBackground.jsx';
+import SettingsIcon from './assets/config-icon.png';
+import SendIcon from './assets/send-icon.png';
+import ChatMessage from './components/ChatMessage.jsx';
 
-function ChatPage() {
-  // Estado para controlar se estamos conectados ou não.
-  const [isConnected, setIsConnected] = useState(false);
-  // Estado para armazenar o valor do campo de input.
-  const [message, setMessage] = useState('');
-  // Estado para armazenar todas as mensagens do chat.
-  const [chatMessages, setChatMessages] = useState([]);
-  // Estado para mensagens de erro ou status.
-  const [statusMessage, setStatusMessage] = useState('Pronto para conectar.');
-
-  // Ref para o elemento da área de chat, para rolar automaticamente para baixo.
+function ChatPage({
+  setCurrentPage,
+  isConnected,
+  message,
+  setMessage,
+  chatMessages,
+  statusMessage,
+  handleConnect,
+  handleSendMessage
+}) {
   const chatAreaRef = useRef(null);
 
-  // Listinha fake só para visualizar a lateral de chats (não impacta lógica do app).
   const fakeChats = [
     { id: 1, title: 'Geral', preview: 'Bem-vindo ao Concord' },
     { id: 2, title: 'Equipe', preview: 'Daily às 9h' },
   ];
 
-  // useEffect é um hook do React que executa efeitos colaterais.
-  // Este será executado uma única vez quando o componente for montado.
-  useEffect(() => {
-    // Configura o "ouvinte" para receber dados do servidor TCP (via main.js).
-    window.api.onTcpData((data) => {
-      // Adiciona a nova mensagem recebida à lista de mensagens.
-      setChatMessages((prevMessages) => [...prevMessages, `Servidor: ${data.trim()}`]);
-    });
-
-    // Configura o "ouvinte" para o status da conexão.
-    window.api.onTcpStatus((status) => {
-      setIsConnected(status.connected);
-      if (status.connected) {
-        setStatusMessage('Conectado ao servidor!');
-      } else {
-        setStatusMessage(status.error ? `Erro: ${status.error}` : 'Desconectado.');
-      }
-    });
-
-    // Função de limpeza: remove os "ouvintes" quando o componente for desmontado.
-    return () => {
-      window.api.removeAllListeners('tcp-data');
-      window.api.removeAllListeners('tcp-status');
-    };
-  }, []); // O array vazio [] garante que este efeito rode apenas uma vez.
-
-  // Efeito para rolar a área do chat para a última mensagem.
   useEffect(() => {
     if (chatAreaRef.current) {
       chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
     }
   }, [chatMessages]);
-
-  // Função para lidar com o clique no botão de conectar.
-  const handleConnect = () => {
-    setStatusMessage('Tentando conectar...');
-    window.api.tcpConnect(); // Chama a função exposta no preload.js
-  };
-  
-  // Função para lidar com o envio de uma mensagem.
-  const handleSendMessage = (e) => {
-    e.preventDefault(); // Impede o formulário de recarregar a página.
-    if (message.trim() && isConnected) {
-      window.api.tcpSend(message); // Envia a mensagem.
-      setChatMessages((prev) => [...prev, `Você: ${message}`]); // Adiciona à UI localmente.
-      setMessage(''); // Limpa o campo de input.
-    }
-  };
 
   return (
     <div className="flex h-full gap-6 p-6" style={{ backgroundColor: '#242323' }}>
@@ -78,66 +36,87 @@ function ChatPage() {
         onSelect={(id) => console.log('select', id)}
         onAdd={() => console.log('novo chat')}
       />
-
       <InfoBackground className="flex-1">
         <div className="flex flex-col h-full p-4">
-          <header className="mb-4">
-            <h1 className="text-3xl font-bold text-cyan-400">Chat TCP</h1>
-            <p className="text-gray-400">{statusMessage}</p>
+          <header className="flex justify-between items-center mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-400">Concord</h1>
+              <p className="text-gray-400">{statusMessage}</p>
+            </div>
+            <button 
+              onClick={() => setCurrentPage('settings')}
+              className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-colors duration-200 cursor-pointer"
+            >
+              <span className="font-semibold">Configurações →</span>
+              <img src={SettingsIcon} alt="Configurações" className="w-10 h-10" />
+            </button>
           </header>
 
-          {/* Botão de Conectar */}
           {!isConnected && (
             <div className="mb-4">
               <button
-                onClick={handleConnect}
+                onClick={handleConnect} 
                 className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded transition-colors"
               >
                 Conectar ao Servidor
               </button>
             </div>
           )}
-
-          {/* Área de Mensagens */}
-          <div
-            ref={chatAreaRef}
-            // <<-- ALTERAÇÃO AQUI: Trocamos o nome da classe -->>
-          // PASSO 2: A div principal da área de chat também precisa de arredondamento total.
-          // Removemos rounded-b-xl e colocamos rounded-xl.
-          className="flex-grow p-6 relative bg-[#353333] overflow-hidden rounded-xl"
-        >
-          {/* PASSO 3: A DIV dedicada para o fundo TAMBÉM precisa de arredondamento total. */}
-          <div 
-            className="absolute inset-0 bg-imagemchat bg-repeat invert opacity-20 rounded-xl"
-          ></div>
-          <div 
-            className="absolute inset-0 bg-imagemchat bg-repeat invert opacity-20 rounded-xl"
-          ></div>
-            {chatMessages.map((msg, index) => (
-              <p key={index} className="mb-1">
-                {msg}
-              </p>
-            ))}
-          </div>
-
-          {/* Formulário de Envio de Mensagem */}
-          <form onSubmit={handleSendMessage} className="flex">
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={isConnected ? 'Digite sua mensagem...' : 'Conecte-se para enviar mensagens'}
-              disabled={!isConnected}
-              className="flex-grow bg-gray-700 text-white rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            <button
-              type="submit"
-              disabled={!isConnected}
-              className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-r-lg disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+          
+          <div className="flex-grow relative bg-[#353333] overflow-hidden rounded-xl">
+            <div className="absolute inset-0 bg-imagemchat bg-repeat invert opacity-20"></div>
+            <div
+              ref={chatAreaRef}
+              className="absolute top-0 left-0 right-0 bottom-24 px-6 overflow-y-auto custom-scrollbar"
             >
-              Enviar
-            </button>
-          </form>
+              {chatMessages.map((msg, index) => (
+                <ChatMessage key={index} message={msg} />
+              ))}
+            </div>
+            
+            <>
+              <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Istok+Web:ital,wght@1,700&display=swap');
+                .custom-placeholder::placeholder {
+                  font-family: 'Istok Web', sans-serif; font-weight: 700; font-style: italic; color: #FFFFFF;
+                }
+                .custom-scrollbar::-webkit-scrollbar {
+                  width: 12px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                  background-color: #555;
+                  border-radius: 10px;
+                  border: 3px solid transparent;
+                  background-clip: content-box;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                  background-color: #888;
+                }
+              `}</style>
+              <div className="absolute bottom-[26px] left-[35px] right-[35px]">
+                <form onSubmit={handleSendMessage} className="relative flex items-center">
+                  <input
+                    type="text"
+                    value={message} 
+                    onChange={(e) => setMessage(e.target.value)} 
+                    placeholder={isConnected ? 'Digite sua mensagem...' : 'Conecte-se para enviar mensagens'}
+                    disabled={!isConnected} 
+                    className="flex-grow w-full bg-[#404040] text-white rounded-[50px] p-4 pr-[70px] focus:outline-none focus:ring-2 focus:ring-cyan-500 custom-placeholder"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!isConnected}
+                    className="absolute right-[14px] w-[42px] h-[42px] bg-white rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-110 active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+                  >
+                    <img src={SendIcon} alt="Enviar" className="w-[30px] h-[30px]" />
+                  </button>
+                </form>
+              </div>
+            </>
+          </div>
         </div>
       </InfoBackground>
     </div>
