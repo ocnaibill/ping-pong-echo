@@ -6,7 +6,12 @@ export default {
     "./client/src/**/*.{js,ts,jsx,tsx}", 
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        // <<-- ALTERAÇÃO AQUI -->>
+        'imagemchat': "url('/src/assets/imagemchat.png')",
+      }
+    },
   },
   plugins: [],
 }
