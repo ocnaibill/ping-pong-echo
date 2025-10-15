@@ -70,7 +70,6 @@ function ChatPage() {
     }
   };
 
-  // Layout em duas colunas (mudança mínima): Sidebar + InfoBackground contendo TODO o seu JSX original
   return (
     <div className="flex h-full gap-6 p-6" style={{ backgroundColor: '#242323' }}>
       <ChatSidebar
@@ -81,7 +80,6 @@ function ChatPage() {
       />
 
       <InfoBackground className="flex-1">
-        {/* ======= SEU JSX ORIGINAL FOI MANTIDO AQUI DENTRO ======= */}
         <div className="flex flex-col h-full p-4">
           <header className="mb-4">
             <h1 className="text-3xl font-bold text-cyan-400">Chat TCP</h1>
@@ -103,8 +101,18 @@ function ChatPage() {
           {/* Área de Mensagens */}
           <div
             ref={chatAreaRef}
-            className="flex-grow bg-gray-800 rounded-lg p-4 mb-4 overflow-y-auto"
-          >
+            // <<-- ALTERAÇÃO AQUI: Trocamos o nome da classe -->>
+          // PASSO 2: A div principal da área de chat também precisa de arredondamento total.
+          // Removemos rounded-b-xl e colocamos rounded-xl.
+          className="flex-grow p-6 relative bg-[#353333] overflow-hidden rounded-xl"
+        >
+          {/* PASSO 3: A DIV dedicada para o fundo TAMBÉM precisa de arredondamento total. */}
+          <div 
+            className="absolute inset-0 bg-imagemchat bg-repeat invert opacity-20 rounded-xl"
+          ></div>
+          <div 
+            className="absolute inset-0 bg-imagemchat bg-repeat invert opacity-20 rounded-xl"
+          ></div>
             {chatMessages.map((msg, index) => (
               <p key={index} className="mb-1">
                 {msg}
@@ -131,7 +139,6 @@ function ChatPage() {
             </button>
           </form>
         </div>
-        {/* ======= FIM DO SEU JSX ORIGINAL ======= */}
       </InfoBackground>
     </div>
   );

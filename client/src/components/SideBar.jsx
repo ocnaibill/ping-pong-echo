@@ -3,7 +3,8 @@ import React from 'react';
 // Recebemos `currentPage` e `setCurrentPage` como props do componente pai (App.jsx)
 function SideBar({ currentPage, setCurrentPage }) {
   return (
-    <aside className="w-48 bg-gray-800 p-4 flex flex-col">
+    // <<-- ALTERAÇÃO AQUI: Trocamos bg-gray-800 por bg-black -->>
+    <aside className="w-48 bg-black p-4 flex flex-col">
       <h2 className="text-xl font-bold text-white mb-6">Menu</h2>
       <nav className="flex flex-col space-y-2">
         <button
