@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react'; 
+import React, { useEffect, useRef, useState } from 'react'; 
 import ChatSidebar from './components/ChatSidebar.jsx';
 import InfoBackground from './components/InfoBackground.jsx';
 import SettingsIcon from './assets/config-icon.png';
 import SendIcon from './assets/send-icon.png';
 import ChatMessage from './components/ChatMessage.jsx';
-
+import PopupNome from './components/PopUpNome.jsx'; 
+import PopupErro from './components/PopUpErro.jsx'; 
 function ChatPage({
   setCurrentPage,
   isConnected,
@@ -17,10 +18,21 @@ function ChatPage({
 }) {
   const chatAreaRef = useRef(null);
 
+  const [userName, setUserName] = useState(null); // Estado para o nome do usuário
+  const [isPopupOpen, setIsPopupOpen] = useState(false); // Estado para controlar o popup de nome
+  const [isErrorPopupOpen, setIsErrorPopupOpen] = useState(false); // Estado para controlar o popup de erro
+
   const fakeChats = [
     { id: 1, title: 'Geral', preview: 'Bem-vindo ao Concord' },
     { id: 2, title: 'Equipe', preview: 'Daily às 9h' },
   ];
+
+  useEffect(() => {
+    if (!userName) {
+      // Se o nome do usuário não estiver definido, abre o popup
+      setIsPopupOpen(true);
+    }
+  }, [userName]);
 
   useEffect(() => {
     if (chatAreaRef.current) {
@@ -28,8 +40,26 @@ function ChatPage({
     }
   }, [chatMessages]);
 
+  const handleSetUserName = (name) => {
+    setUserName(name); 
+    setIsPopupOpen(false);
+  };
+
   return (
     <div className="flex h-full gap-6 p-6" style={{ backgroundColor: '#242323' }}>
+      {/* PopupNome */}
+      <PopupNome
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        onConfirm={handleSetUserName} 
+      />
+
+      {/* PopupErro */}
+      <PopupErro
+        isOpen={isErrorPopupOpen}
+        onClose={() => setIsErrorPopupOpen(false)} 
+      />
+
       <ChatSidebar
         chats={fakeChats}
         selectedId={1}
@@ -62,6 +92,16 @@ function ChatPage({
               </button>
             </div>
           )}
+
+          {/* Botão temporário para testar o PopupErro */}
+          <div className="mb-4">
+            <button
+              onClick={() => setIsErrorPopupOpen(true)} // Abre o popup de erro
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors"
+            >
+              Testar Popup de Erro
+            </button>
+          </div>
           
           <div className="flex-grow relative bg-[#353333] overflow-hidden rounded-xl">
             <div className="absolute inset-0 bg-imagemchat bg-repeat invert opacity-20"></div>

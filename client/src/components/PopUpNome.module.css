@@ -1,0 +1,93 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px); /* 🔹 desfoque de fundo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  transition: opacity 0.3s ease;
+}
+
+.popup {
+  background: #222;
+  color: #fff;
+  padding: 60px 40px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  min-width: 320px;
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+.popup h2 {
+  margin-bottom: 60px;
+  font-size: 1.4rem;
+}
+
+.popup label {
+  display: block;
+  margin-bottom: 15px;
+  text-align: left;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.popup input {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 30px;
+  border: none;
+  background-color: #444;
+  color: #fff;
+  outline: none;
+  margin-bottom: 80px;
+  transition: background 0.3s;
+}
+
+.popup input::placeholder {
+  color: #999;
+}
+
+.popup input:focus {
+  background-color: #555;
+}
+
+.popup button {
+  background-color: #0a3d91;
+  color: white;
+  border: none;
+  padding: 5px 50px;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.popup button:hover {
+  background-color: #002b6d;
+  transform: scale(1.05);
+}
+
+.fadeIn {
+  opacity: 1;
+}
+
+.fadeOut {
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
