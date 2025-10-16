@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./PopUpNome.module.css";
 
-const PopupNome =({ isOpen, onClose }) => {
+const PopupNome = ({ isOpen, onClose, onConfirm }) => { 
   const [nick, setNick] = useState("");
   const [show, setShow] = useState(false);
 
@@ -13,7 +13,7 @@ const PopupNome =({ isOpen, onClose }) => {
   if (!isOpen && !show) return null;
 
   const handleConfirm = () => {
-    console.log("Nome digitado:", nick);
+    onConfirm(nick); 
     onClose();
   };
 
