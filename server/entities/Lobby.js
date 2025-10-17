@@ -68,7 +68,7 @@ export class Lobby extends ChannelHandler {
                 room.port.terminate()
                 this.rooms.delete(room.id)
 
-                this.broadcastMessage(null, 'removed-room', `A sala ${room.name} foi criada`)
+                this.broadcastMessage(null, 'removed-room', `A sala ${room.name} foi removida`)
             }
         })
 
