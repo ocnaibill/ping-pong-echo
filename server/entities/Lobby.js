@@ -61,13 +61,18 @@ export class Lobby extends ChannelHandler {
                 console.log(`[LOBBY] ${user.nickname} saiu da sala ${room.name}.`)
                 const connected = this.addUser(user.port)
                 connected.nickname = user.nickname
+                connected.respond('success', { msg: 'Você retornou ao lobby.' })
             }
             if (msg === 'closed') {
                 console.log(`[LOBBY] A sala ${room.name} foi removida.`)
                 room.port.terminate()
                 this.rooms.delete(room.id)
+
+                this.broadcastMessage(null, 'removed-room', `A sala ${room.name} foi criada`)
             }
         })
+
+        this.broadcastMessage(null, 'created-room', `A sala ${room.name} foi criada`)
 
         this.removeUser(user.id)
         this.rooms.set(this.#roomIdAccumulator, room)

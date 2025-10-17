@@ -57,13 +57,15 @@ export class ChannelHandler {
         })
     }
 
-    broadcastMessage(sender, message) {
+    broadcastMessage(sender, type, message) {
         this.users.values().forEach(user => {
+            sender = sender ?? { id: -1, nickname: 'server' }
             if (user.id === sender.id) return
 
             user.respond('broadcast', {
                 sender: sender.nickname,
-                message
+                type,
+                message,
             })
         });
     }

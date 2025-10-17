@@ -6,7 +6,11 @@ export class Room extends ChannelHandler {
 
         this.commands = {
             'message': ({ user, message }) => {
-                this.broadcastMessage(user, message)
+                this.broadcastMessage(user, 'message', message)
+
+                user.respond('success', {
+                    msg: message
+                })
             },
             'leave': ({ user }) => {
                 this.leaveUser(user)
@@ -27,6 +31,7 @@ export class Room extends ChannelHandler {
             'disconnect': ({ user }) => {
                 user.port.close()
                 this.removeUser(user)
+                this.broadcastMessage(null, 'client-disconnected', `${user.nickname} se desconectou.`)
             },
         }
     }
@@ -35,7 +40,7 @@ export class Room extends ChannelHandler {
         const newUser = super.addUser(user.port)
         newUser.nickname = user.nickname
         
-        this.broadcastMessage(newUser, `${user.nickname} entrou na sala.`)
+        this.broadcastMessage(null, 'user-joined', `${user.nickname} entrou na sala.`)
         return newUser
     }
 
@@ -43,13 +48,15 @@ export class Room extends ChannelHandler {
         const oldNick = user.nickname
         super.changeUserNickname(user, newNickname)
 
-        this.broadcastMessage(user, `${oldNick} alterou seu apelido para ${user.nickname}`)
+        this.broadcastMessage(null, 'nick-change', `${oldNick} alterou seu apelido para ${user.nickname}`)
     }
 
     leaveUser(user) {
         this.port.postMessage({msg: 'leaved', payload: user}, [user.port])
         this.removeUser(user.id)
 
+        this.broadcastMessage(null, 'user-leaved', `${user.nickname} saiu da sala.`)
+        
         if (this.users.size === 0) {
             this.port.postMessage({msg: 'closed', payload: null})
         }
